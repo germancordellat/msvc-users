@@ -28,8 +28,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        User savedUser = userService.save(user);
-        return ResponseEntity.ok(savedUser);
+        return ResponseEntity.ok(userService.save(user));
     }
 
     @PutMapping("/{id}")
@@ -44,19 +43,16 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> user = userService.findById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return userService.findById(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        Optional<User> user = userService.findByUsername(username);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return userService.findByUsername(username).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     @GetMapping
     public ResponseEntity<Iterable<User>> findAll() {
-        Iterable<User> users = userService.findAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @DeleteMapping("/{id}")
