@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,18 +24,25 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userService.save(user);
         return ResponseEntity.ok(savedUser);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
         Optional<User> existingUser = userService.findById(id);
         return existingUser.map(userDb -> {
             userDb.setEmail(user.getEmail());
             userDb.setUsername(user.getUsername());
-            userDb.setEnabled(user.isEnabled());
+            if(userDb.isEnabled() != null ){
+                userDb.setEnabled(user.isEnabled());
+            }
             return ResponseEntity.ok(userService.save(userDb));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
